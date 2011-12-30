@@ -1,0 +1,27 @@
+extends layout
+block content
+	#forums(data-bind="foreach: forums")
+		.forum
+			p(data-bind="text: name")
+			p(data-bind="text: category_id")
+			a(data-bind="attr: {href: '/forum/'+id}") Idź
+	script
+		var socket = io.connect();
+
+		function AppViewModel(sampleArray) {
+			self.forums = ko.observableArray(sampleArray);
+		}    
+
+		// socket.io specific code
+		
+		socket.on('forumsWithCategories',function(forums){
+			ko.applyBindings(new AppViewModel(forums));
+		});
+		
+		function appendForum (msg) {
+			self.forums.push(msg);
+		}
+
+		socket.emit('get forumsWithCategories');
+		
+	include js_new_message

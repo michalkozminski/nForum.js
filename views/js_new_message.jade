@@ -1,0 +1,4 @@
+script
+	socket.on('new message',function(message, messageParams){
+		$('#info').html("Nowa wiadomość od:"+message.username);
+	});

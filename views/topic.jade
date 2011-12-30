@@ -1,0 +1,34 @@
+extends layout
+block content
+	#replys(data-bind="foreach: messages")
+		.reply
+			p(data-bind="text: body")
+			p(data-bind="text: username")
+	form#answer(action="#")
+		p
+			textarea#body(name="body")
+		p
+			input#username(name="username")
+		p
+			button#button(type="submit") Wyślij
+	script
+		var socket = io.connect();
+
+		function AppViewModel(sampleArray) {
+			self.messages = ko.observableArray(sampleArray);
+		}    
+		// socket.io specific code
+
+		socket.on('answers',function(answers){
+			ko.applyBindings(new AppViewModel(answers));
+		});
+
+		socket.emit('get topic', #{topicId});
+		$('#answer').submit(function(){
+			socket.emit('new answer',
+				$('#body').val(),
+				$('#username').val(),
+				#{topicId});
+				return false;
+		});
+	include js_new_message		

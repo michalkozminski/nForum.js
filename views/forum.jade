@@ -1,0 +1,21 @@
+extends layout
+block content
+	#topics(data-bind="foreach: topics")
+		.topic
+			p(data-bind="text:topic")
+			a(data-bind="attr: {href: '/topic/'+id}") Idź
+	script
+		var socket = io.connect();
+
+		function AppViewModel(sampleArray) {
+			self.topics = ko.observableArray(sampleArray);
+		}    
+
+		// socket.io specific code
+
+		socket.on('topics',function(topics){
+			ko.applyBindings(new AppViewModel(topics));
+		});
+
+		socket.emit('get forum');
+	include js_new_message
