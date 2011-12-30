@@ -17,6 +17,9 @@ exports.use = function(app){
 				if(err){
 					throw err;
 				}
+				results.forEach(function(element){
+					element.isNew = false;
+				});
 				socket.emit('forumsWithCategories',results);
 			});
 		});

@@ -2,7 +2,7 @@ extends layout
 block content
 	#forums(data-bind="foreach: forums")
 		.forum
-			p(data-bind="text: name")
+			p(data-bind="text: name, css: {new: isNew == true }")
 			p(data-bind="text: category_id")
 			a(data-bind="attr: {href: '/forum/'+id}") Idź
 	script
@@ -10,6 +10,7 @@ block content
 
 		function AppViewModel(sampleArray) {
 			self.forums = ko.observableArray(sampleArray);
+			this.update = function()self.forums[0]
 		}    
 
 		// socket.io specific code
@@ -21,7 +22,27 @@ block content
 		function appendForum (msg) {
 			self.forums.push(msg);
 		}
+		
+		function changeInKOArray(KOArray, objectToChange, newValue, searchFunction){
+			for(var i = 0, j = KOArray().length; i < j; i++){
+				if( searchFunction(KOArray()[i]) == true){
+					KOArray()[i][objectToChange] = newValue;
+				}
+			}
+		}
 
 		socket.emit('get forumsWithCategories');
-		
-	include js_new_message
+
+		socket.on('new message',function(message, messageParams){
+			alert("przyszło");
+			$('#info').html("Nowa wiadomość od:"+message.username);
+			var modificatedForum = {id:messageParams.forum_id, name: messageParams.name, category_id: messageParams.category_id};
+			console.log(modificatedForum);
+			changeInKOArray(self.forums, "isNew", true, function(testedObject){
+				if(testedObject.id == modificatedForum.id){
+					return true;
+				}else{
+					return false;
+				}
+			});
+		});
